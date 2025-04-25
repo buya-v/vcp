@@ -1,0 +1,27 @@
+<odoo>
+    <template id="membership_request_form" name="Membership Request Form">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <h1><t t-esc="'Membership Request' | translate"/></h1>
+                <form action="/membership/request/submit" method="post">
+                    <div class="form-group">
+                        <label for="name"><t t-esc="'Name' | translate"/></label>
+                        <input type="text" id="name" name="name" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="email"><t t-esc="'Email' | translate"/></label>
+                        <input type="email" id="email" name="email" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="partner_type"><t t-esc="'Type' | translate"/></label>
+                        <select id="partner_type" name="partner_type" class="form-control" required>
+                            <option value="herder"><t t-esc="'Herder' | translate"/></option>
+                            <option value="farmer"><t t-esc="'Farmer' | translate"/></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><t t-esc="'Submit' | translate"/></button>
+                </form>
+            </div>
+        </t>
+    </template>
+</odoo>

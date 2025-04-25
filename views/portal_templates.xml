@@ -1,0 +1,11 @@
+<template id="portal_my_cooperatives" name="My Cooperatives" inherit_id="portal.portal_my_home">
+    <xpath expr="//div[@id='portal_content']" position="inside">
+        <h2>My Cooperatives</h2>
+        <t t-foreach="cooperatives" t-as="cooperative">
+            <div>
+                <strong><t t-esc="cooperative.name"/></strong>
+                <p><t t-esc="cooperative.description"/></p>
+            </div>
+        </t>
+    </xpath>
+</template>

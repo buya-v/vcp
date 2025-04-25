@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vcp_cooperative_user,vcp.cooperative.user,model_vcp_cooperative,base.group_user,1,1,1,1
+access_vcp_cooperative_type_user,vcp.cooperative.type.user,model_vcp_cooperative_type,base.group_user,1,1,1,1
+access_vcp_cooperative_member_user,vcp.cooperative.member.user,model_vcp_cooperative_member,base.group_user,1,1,1,1

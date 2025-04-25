@@ -1,0 +1,7 @@
+<template id="MembershipForm" name="Membership Form">
+    <form t-on-submit="submitForm">
+        <input type="text" name="name" placeholder="Name" required="required"/>
+        <input type="email" name="email" placeholder="Email" required="required"/>
+        <button type="submit">Submit</button>
+    </form>
+</template>

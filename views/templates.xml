@@ -1,0 +1,15 @@
+<templates>
+    <t t-name="virtual_cooperative_addon.cooperative_template">
+        <div>
+            <h1>Cooperative Details</h1>
+            <p>Name: <t t-esc="cooperative.name"/></p>
+            <p>Description: <t t-esc="cooperative.description"/></p>
+            <h2>Members</h2>
+            <ul>
+                <t t-foreach="cooperative.member_ids" t-as="member">
+                    <li><t t-esc="member.name"/></li>
+                </t>
+            </ul>
+        </div>
+    </t>
+</templates>
