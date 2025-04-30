@@ -1,1 +1,2 @@
-# from . import membership_request
+# -*- coding: utf-8 -*-
+from . import main

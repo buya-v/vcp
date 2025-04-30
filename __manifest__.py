@@ -1,6 +1,6 @@
 {
     'name': 'Virtual Cooperative Management',
-    'version': '1.0',
+    'version': '18.0.1.0.0',
     'summary': 'Manage virtual cooperatives and their members',
     'description': """
         This module allows users to manage virtual cooperatives, add members, 
@@ -13,15 +13,19 @@
     'depends': [
         'base',
         'portal',
+        'mail', # Required for messaging and notifications
         # 'queue_job',  # Disabled asynchronous processing
         'web',        # Required for OWL framework integration
     ],
     'data': [
         'security/ir.model.access.csv',
-        # 'security/security.xml',
+        # 'security/security.xml', # Define groups here if needed
+        'data/ir_sequence_data.xml',
         'views/cooperative_views.xml',
         'views/cooperative_type_views.xml',
-        # 'views/portal_templates.xml',
+        'views/membership_application_views.xml', 
+        'views/website_membership_templates.xml',
+        # 'views/cooperative_member_views.xml',
     ],
     
     # 'assets': {

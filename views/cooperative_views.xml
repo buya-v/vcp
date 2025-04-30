@@ -1,4 +1,23 @@
 <odoo>
+        <!-- Search View -->
+        <record id="view_cooperative_search" model="ir.ui.view">
+            <field name="name">cooperative.search</field>
+            <field name="model">vcp.cooperative</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Cooperative"/>
+                    <field name="cooperative_type_id"/>
+                    <separator/>
+                    <filter name="filter_active" string="Active" domain="[('active', '=', True)]"/>
+                    <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
+                    <group expand="1" string="Group By">
+                        <filter name="group_by_type" string="Type" context="{'group_by':'cooperative_type_id'}"/>
+                        <filter name="group_by_active" string="Status" context="{'group_by':'active'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!-- List View -->
         <record id="view_cooperative_list" model="ir.ui.view">
             <field name="name">cooperative.list</field>
@@ -6,8 +25,10 @@
             <field name="arch" type="xml">
                 <list>
                     <field name="name"/>
-                    <field name="description"/>
+                    <field name="description" optional="hide"/> <!-- Hide description by default -->
                     <field name="cooperative_type_id"/>
+                    <field name="member_count" sum="Total Members"/> <!-- Added member_count -->
+                    <field name="active" optional="hide" widget="boolean_toggle"/> <!-- Added active field -->
                 </list>
             </field>
         </record>
@@ -19,19 +40,48 @@
             <field name="arch" type="xml">
                 <form>
                     <sheet>
+                        <!-- Active Toggle -->
+                        <field name="active" widget="boolean_toggle" class="oe_inline"/>
+                        <!-- Stat Button Box -->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_members" type="object" class="oe_stat_button" icon="fa-users">
+                                <!-- Use plural string for label if count != 1 -->
+                                <field string="Members" name="member_count" widget="statinfo"/>
+                            </button>
+                        </div>
+                        <!-- Main Fields -->
                         <group>
                             <field name="name"/>
                             <field name="description"/>
                             <field name="cooperative_type_id"/>
                         </group>
-                        <group string="Members">
-                            <field name="member_ids">
-                                <list editable="bottom" create="1" delete="1">
-                                    <field name="partner_id"/>
-                                    <field name="member_type"/>
-                                </list>
-                            </field>
-                        </group>
+                        <!-- Notebook for Related Info -->
+                        <notebook>
+                            <page string="Members">
+                                <field name="member_ids" nolabel="1"> <!-- nolabel avoids redundant "Members" label -->
+                                    <!-- Use tree view for inline list -->
+                                    <list editable="bottom" create="1" delete="1">
+                                        <!-- Assuming these fields exist on vcp.cooperative.member -->
+                                        <field name="partner_id"/>
+                                        <field name="member_type"/>
+                                        <!-- Add other relevant member fields here -->
+                                    </list>
+                                    <!-- Optional: Add form view for members if needed when clicking a row -->
+                                    <!-- <form>
+                                        <group>
+                                            <field name="partner_id"/>
+                                            <field name="member_type"/>
+                                        </group>
+                                    </form> -->
+                                </field>
+                            </page>
+                            <!-- Add other pages here if needed -->
+                            <!-- <page string="Other Info">
+                                <group>
+                                    <field name="some_other_field"/>
+                                </group>
+                            </page> -->
+                        </notebook>
                     </sheet>
                 </form>
             </field>
@@ -42,9 +92,18 @@
             <field name="name">Cooperatives</field>
             <field name="res_model">vcp.cooperative</field>
             <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_cooperative_search"/> <!-- Added search view -->
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new cooperative
+              </p><p>
+                Manage your virtual cooperatives and their members here.
+              </p>
+            </field>
         </record>
 
         <!-- Menu -->
-        <menuitem id="menu_cooperative_root" name="Cooperatives" sequence="10"/>
+        <!-- Note: For web_icon to work, create: vcp/static/description/icon.png -->
+        <menuitem id="menu_cooperative_root" name="Cooperatives" sequence="10" web_icon="vcp,static/description/icon.png"/>
         <menuitem id="menu_cooperative" name="Manage Cooperatives" parent="menu_cooperative_root" action="action_cooperative" sequence="10"/>
 </odoo>

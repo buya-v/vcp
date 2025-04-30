@@ -7,7 +7,7 @@
                 <list>
                     <field name="name"/>
                     <field name="description"/>
-                    <field name="active"/>
+                    <field name="active" widget="boolean_toggle"/> <!-- Added widget -->
                 </list>
             </field>
         </record>
@@ -22,7 +22,7 @@
                         <group>
                             <field name="name"/>
                             <field name="description"/>
-                            <field name="active"/>
+                            <field name="active" widget="boolean_toggle"/> <!-- Added widget -->
                         </group>
                     </sheet>
                 </form>

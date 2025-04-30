@@ -2,3 +2,7 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_vcp_cooperative_user,vcp.cooperative.user,model_vcp_cooperative,base.group_user,1,1,1,1
 access_vcp_cooperative_type_user,vcp.cooperative.type.user,model_vcp_cooperative_type,base.group_user,1,1,1,1
 access_vcp_cooperative_member_user,vcp.cooperative.member.user,model_vcp_cooperative_member,base.group_user,1,1,1,1
+access_membership_application_user,access.membership.application.user,model_vcp_membership_application,base.group_user,1,1,1,0
+access_membership_application_manager,access.membership.application.manager,model_vcp_membership_application,base.group_system,1,1,1,1
+access_cooperative_public,access.cooperative.public,model_vcp_cooperative,base.group_public,1,0,0,0
+access_cooperative_portal,access.cooperative.portal,model_vcp_cooperative,base.group_portal,1,0,0,0

@@ -1,0 +1,140 @@
+<odoo>
+    <data>
+
+        <!-- Search View for Membership Application -->
+        <record id="view_membership_application_search" model="ir.ui.view">
+            <field name="name">membership.application.search</field>
+            <field name="model">vcp.membership.application</field>
+            <field name="arch" type="xml">
+                <search string="Search Membership Applications">
+                    <field name="name" string="Application Reference"/>
+                    <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]"/>
+                    <field name="cooperative_id"/>
+                    <separator/>
+                    <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="filter_submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter name="filter_under_review" string="Under Review" domain="[('state', '=', 'under_review')]"/>
+                    <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                    <filter name="filter_rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                    <filter name="filter_cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                    <separator/>
+                     <filter name="filter_active_apps" string="Active Applications"
+                            domain="[('state', 'in', ('draft', 'submitted', 'under_review'))]"/>
+                    <separator/>
+                    <!-- Add filter for 'My Applications' if relevant (e.g., based on reviewer or creator) -->
+                    <!-- <filter string="My Applications" name="my_applications" domain="[('reviewer_id', '=', uid)]"/> -->
+                    <group expand="1" string="Group By">
+                        <filter string="Status" name="group_by_state" context="{'group_by':'state'}"/>
+                        <filter string="Cooperative" name="group_by_cooperative" context="{'group_by':'cooperative_id'}"/>
+                        <filter string="Applicant" name="group_by_partner" context="{'group_by':'partner_id'}"/>
+                        <filter string="Reviewer" name="group_by_reviewer" context="{'group_by':'reviewer_id'}"/>
+                        <filter string="Application Month" name="group_by_app_date" context="{'group_by':'application_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- List (Tree) View for Membership Application -->
+        <record id="view_membership_application_list" model="ir.ui.view">
+            <field name="name">membership.application.list</field>
+            <field name="model">vcp.membership.application</field>
+            <field name="arch" type="xml">
+                <!-- Changed from <list> to <tree> for consistency, though list works -->
+                <list string="Membership Applications"
+                      decoration-info="state in ('submitted', 'under_review')"
+                      decoration-success="state == 'approved'"
+                      decoration-danger="state == 'rejected'"
+                      decoration-muted="state in ('draft', 'cancelled')">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="cooperative_id"/>
+                    <field name="application_date"/>
+                    <field name="state"/>
+                    <field name="reviewer_id" optional="show"/>
+                    <field name="review_date" optional="show"/>
+                    <field name="member_id" optional="hide"/> <!-- Hide by default, maybe show if approved -->
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View for Membership Application -->
+        <record id="view_membership_application_form" model="ir.ui.view">
+            <field name="name">membership.application.form</field>
+            <field name="model">vcp.membership.application</field>
+            <field name="arch" type="xml">
+                <form string="Membership Application">
+                    <header>
+                        <!-- Replaced states="..." with invisible="..." -->
+                        <button name="action_submit" string="Submit" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                        <button name="action_review" string="Start Review" type="object" class="oe_highlight" invisible="state != 'submitted'"/>
+                        <button name="action_approve" string="Approve" type="object" class="oe_highlight" invisible="state not in ('submitted', 'under_review')" confirm="Are you sure you want to approve this application and create a member record?"/>
+                        <button name="action_reject" string="Reject" type="object" invisible="state not in ('submitted', 'under_review')" confirm="Are you sure you want to reject this application?"/>
+                        <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('draft', 'submitted', 'under_review')" confirm="Are you sure you want to cancel this application?"/>
+                        <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state not in ('rejected', 'cancelled')" confirm="Are you sure you want to reset this application to draft?"/>
+                        <!-- Status Bar -->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,under_review,approved,rejected"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id" options="{'no_open': False, 'no_create': False}" context="{'res_partner_search_mode': 'customer'}"/>
+                                <field name="cooperative_id" options="{'no_open': False, 'no_create': False}"/>
+                            </group>
+                            <group>
+                                <field name="application_date" readonly="1"/>
+                                <!-- Replaced attrs="{'invisible': ...}" with invisible="..." -->
+                                <field name="member_id" readonly="1" invisible="state != 'approved'"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Details">
+                                <group>
+                                    <field name="motivation"/>
+                                </group>
+                            </page>
+                            <!-- Replaced attrs="{'invisible': ...}" with invisible="..." -->
+                            <page string="Review Information" invisible="state not in ('approved', 'rejected')">
+                                <group>
+                                    <field name="reviewer_id" readonly="1"/>
+                                    <field name="review_date" readonly="1"/>
+                                    <!-- Replaced attrs="{...}" with separate invisible="..." and required="..." -->
+                                    <field name="rejection_reason" invisible="state != 'rejected'" required="state == 'rejected'"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Window Action for Membership Application -->
+        <record id="action_membership_application" model="ir.actions.act_window">
+            <field name="name">Membership Applications</field>
+            <field name="res_model">vcp.membership.application</field>
+            <field name="view_mode">list,form</field> <!-- Changed list to tree -->
+            <field name="search_view_id" ref="view_membership_application_search"/>
+            <field name="context">{'search_default_filter_active_apps': 1}</field> <!-- Default filter -->
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No membership applications found.
+              </p><p>
+                Create a new application to request membership in a cooperative.
+              </p>
+            </field>
+        </record>
+
+        <!-- Menu Item for Membership Application -->
+        <menuitem id="menu_membership_application"
+                  name="Applications"
+                  parent="menu_cooperative_root"
+                  action="action_membership_application"
+                  sequence="30"/>
+
+    </data>
+</odoo>
