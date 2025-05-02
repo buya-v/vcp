@@ -25,6 +25,8 @@
         'views/cooperative_type_views.xml',
         'views/membership_application_views.xml', 
         'views/website_membership_templates.xml',
+        'views/cooperative_application_views.xml',
+        'views/website_cooperative_application_templates.xml',
         # 'views/cooperative_member_views.xml',
     ],
     

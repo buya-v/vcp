@@ -1,0 +1,154 @@
+<odoo>
+    <data>
+
+        <!-- Search View for Cooperative Application -->
+        <record id="view_cooperative_application_search" model="ir.ui.view">
+            <field name="name">cooperative.application.search</field>
+            <field name="model">vcp.cooperative.application</field>
+            <field name="arch" type="xml">
+                <search string="Search Cooperative Applications">
+                    <field name="name" string="Application Reference"/>
+                    <field name="proposer_partner_id" filter_domain="[('proposer_partner_id', 'ilike', self)]"/>
+                    <field name="proposed_name" string="Proposed Name"/>
+                    <field name="proposed_type_id"/>
+                    <field name="created_cooperative_id"/>
+                    <separator/>
+                    <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                    <filter name="filter_submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter name="filter_under_review" string="Under Review" domain="[('state', '=', 'under_review')]"/>
+                    <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                    <filter name="filter_rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                    <filter name="filter_cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                    <separator/>
+                     <filter name="filter_active_apps" string="Active Applications"
+                            domain="[('state', 'in', ('draft', 'submitted', 'under_review'))]"/>
+                    <separator/>
+                    <!-- Add filter for 'My Applications' if relevant (e.g., based on reviewer or creator) -->
+                    <!-- <filter string="My Applications" name="my_applications" domain="['|', ('reviewer_id', '=', uid), ('create_uid', '=', uid)]"/> -->
+                    <group expand="1" string="Group By">
+                        <filter string="Status" name="group_by_state" context="{'group_by':'state'}"/>
+                        <filter string="Proposed Type" name="group_by_proposed_type" context="{'group_by':'proposed_type_id'}"/>
+                        <filter string="Proposer" name="group_by_proposer" context="{'group_by':'proposer_partner_id'}"/>
+                        <filter string="Reviewer" name="group_by_reviewer" context="{'group_by':'reviewer_id'}"/>
+                        <filter string="Application Month" name="group_by_app_date" context="{'group_by':'application_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- List View for Cooperative Application -->
+        <record id="view_cooperative_application_list" model="ir.ui.view">
+            <field name="name">cooperative.application.list</field>
+            <field name="model">vcp.cooperative.application</field>
+            <field name="arch" type="xml">
+                <!-- Changed from <tree> to <list> -->
+                <list string="Cooperative Applications"
+                      decoration-info="state in ('submitted', 'under_review')"
+                      decoration-success="state == 'approved'"
+                      decoration-danger="state == 'rejected'"
+                      decoration-muted="state in ('draft', 'cancelled')">
+                    <field name="name"/>
+                    <field name="proposer_partner_id"/>
+                    <field name="proposed_name"/>
+                    <field name="proposed_type_id"/>
+                    <field name="application_date"/>
+                    <field name="state"/>
+                    <field name="reviewer_id" optional="show"/>
+                    <field name="review_date" optional="show"/>
+                    <field name="created_cooperative_id" optional="show"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Form View for Cooperative Application -->
+        <record id="view_cooperative_application_form" model="ir.ui.view">
+            <field name="name">cooperative.application.form</field>
+            <field name="model">vcp.cooperative.application</field>
+            <field name="arch" type="xml">
+                <form string="Cooperative Application">
+                    <header>
+                        <button name="action_submit" string="Submit" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                        <button name="action_review" string="Start Review" type="object" class="oe_highlight" invisible="state != 'submitted'"/>
+                        <button name="action_approve" string="Approve" type="object" class="oe_highlight" invisible="state not in ('submitted', 'under_review')" confirm="Are you sure you want to approve this application and create the cooperative?"/>
+                        <button name="action_reject" string="Reject" type="object" invisible="state not in ('submitted', 'under_review')" confirm="Are you sure you want to reject this application?"/>
+                        <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('draft', 'submitted', 'under_review')" confirm="Are you sure you want to cancel this application?"/>
+                        <button name="action_reset_to_draft" string="Reset to Draft" type="object" invisible="state not in ('rejected', 'cancelled')" confirm="Are you sure you want to reset this application to draft?"/>
+                        <!-- Status Bar -->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submitted,under_review,approved,rejected"/>
+                    </header>
+                    <sheet>
+                         <!-- Stat Button Box -->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_created_cooperative" type="object" class="oe_stat_button" icon="fa-building-o" invisible="not created_cooperative_id">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">View</span>
+                                    <span class="o_stat_text">Cooperative</span>
+                                </div>
+                            </button>
+                        </div>
+                        <!-- Title -->
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <!-- Main Fields -->
+                        <group>
+                            <group>
+                                <field name="proposer_partner_id" options="{'no_open': False, 'no_create': True}"/>
+                                <field name="proposed_name"/>
+                                <field name="proposed_type_id" options="{'no_open': False, 'no_create': False}"/>
+                            </group>
+                            <group>
+                                <field name="application_date" readonly="1"/>
+                                <field name="created_cooperative_id" readonly="1" invisible="not created_cooperative_id"/>
+                            </group>
+                        </group>
+                        <!-- Notebook -->
+                        <notebook>
+                            <page string="Details">
+                                <group>
+                                    <field name="proposed_description" placeholder="Describe the purpose, goals, and planned activities of the proposed cooperative..."/>
+                                </group>
+                            </page>
+                            <page string="Review Information" invisible="state not in ('approved', 'rejected')">
+                                <group>
+                                    <field name="reviewer_id" readonly="1"/>
+                                    <field name="review_date" readonly="1"/>
+                                    <field name="rejection_reason" invisible="state != 'rejected'" required="state == 'rejected'"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <!-- Chatter -->
+                    <chatter/>
+                </form>
+            </field>
+        </record>
+
+        <!-- Window Action for Cooperative Application -->
+        <record id="action_cooperative_application" model="ir.actions.act_window">
+            <field name="name">Cooperative Applications</field>
+            <field name="res_model">vcp.cooperative.application</field>
+            <!-- Changed view_mode to use list -->
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_cooperative_application_search"/>
+            <field name="context">{'search_default_filter_active_apps': 1}</field> <!-- Default filter -->
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No cooperative applications found.
+              </p><p>
+                Create a new application to propose the creation of a cooperative.
+              </p>
+            </field>
+        </record>
+
+        <!-- Menu Item for Cooperative Application -->
+        <menuitem id="menu_cooperative_application"
+                  name="Cooperative Applications"
+                  parent="menu_cooperative_root"
+                  action="action_cooperative_application"
+                  sequence="40"/> <!-- Sequence after Membership Applications -->
+
+    </data>
+</odoo>

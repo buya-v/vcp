@@ -126,4 +126,91 @@ class MembershipWebsite(http.Controller):
     @http.route('/cooperative/apply/thankyou', type='http', auth='public', website=True, sitemap=False)
     def membership_apply_thankyou(self, **kw):
         return request.render('vcp.membership_application_thankyou_template')
+    
+    # --- Cooperative Creation Application Routes ---
+
+    # Route to display the cooperative creation form
+    @http.route('/cooperative/create/apply', type='http', auth='public', website=True, sitemap=True)
+    def cooperative_create_apply_form(self, **kw):
+        try:
+            cooperative_types = request.env['vcp.cooperative.type'].search([('active', '=', True)])
+            values = {
+                'cooperative_types': cooperative_types,
+                'error': kw.get('error'),
+                'error_message': kw.get('error_message'),
+                'submitted_data': kw # Pass back submitted data on error
+            }
+            # Use a distinct template name
+            return request.render('vcp.cooperative_application_form_template', values)
+        except Exception as e:
+            _logger.error(f"Error rendering cooperative application form: {e}", exc_info=True)
+            return request.render('vcp.cooperative_application_form_template', {
+                'cooperative_types': [],
+                'error': True,
+                'error_message': _("An error occurred while loading the form. Please try again later.")
+            })
+
+    # Route to handle cooperative creation form submission
+    @http.route('/cooperative/create/apply/submit', type='http', auth='public', website=True, methods=['POST'], csrf=True)
+    def cooperative_create_apply_submit(self, **post):
+        # Basic Validation
+        required_fields = ['proposer_name', 'proposer_email', 'proposed_name', 'proposed_type_id', 'proposed_description']
+        missing_fields = [field for field in required_fields if not post.get(field)]
+        if missing_fields:
+            error_msg = _("Please fill in all required fields: %s") % ', '.join(mf.replace('_', ' ').title() for mf in missing_fields)
+            post['error'] = True
+            post['error_message'] = error_msg
+            # Re-render form with error and submitted data
+            return self.cooperative_create_apply_form(**post)
+
+        try:
+            proposed_type_id = int(post.get('proposed_type_id'))
+            proposer_name = post.get('proposer_name')
+            proposer_email = post.get('proposer_email')
+            proposer_phone = post.get('proposer_phone') # Optional
+            proposed_name = post.get('proposed_name')
+            proposed_description = post.get('proposed_description')
+
+            # Get or create proposer partner (using the same helper method)
+            # Ensure _get_applicant_partner is accessible or defined in this class
+            proposer_partner = self._get_applicant_partner(proposer_name, proposer_email, proposer_phone)
+
+            # Prepare application values
+            application_vals = {
+                'proposer_partner_id': proposer_partner.id,
+                'proposed_name': proposed_name,
+                'proposed_type_id': proposed_type_id,
+                'proposed_description': proposed_description,
+                'state': 'submitted', # Automatically set state to submitted from web form
+            }
+
+            # Create the application using sudo()
+            application = request.env['vcp.cooperative.application'].sudo().create(application_vals)
+            _logger.info(f"Cooperative application created from website: {application.name} by partner {proposer_partner.id}")
+
+            # Redirect to a thank you page
+            return request.redirect('/cooperative/create/apply/thankyou')
+
+        except ValidationError as ve:
+             _logger.warning(f"Validation Error submitting cooperative application: {ve}")
+             post['error'] = True
+             post['error_message'] = str(ve)
+             return self.cooperative_create_apply_form(**post)
+        except ValueError: # Handle invalid proposed_type_id conversion
+             _logger.warning(f"Invalid cooperative type ID received: {post.get('proposed_type_id')}")
+             post['error'] = True
+             post['error_message'] = _("Invalid cooperative type selected.")
+             return self.cooperative_create_apply_form(**post)
+        except Exception as e:
+            _logger.error(f"Error processing cooperative application submission: {e}", exc_info=True)
+            post['error'] = True
+            post['error_message'] = _("An unexpected error occurred. Please try again or contact support.")
+            # Re-render form with error
+            return self.cooperative_create_apply_form(**post)
+
+    # Route for the cooperative creation thank you page
+    @http.route('/cooperative/create/apply/thankyou', type='http', auth='public', website=True, sitemap=False)
+    def cooperative_create_apply_thankyou(self, **kw):
+        # Use a distinct template name
+        return request.render('vcp.cooperative_application_thankyou_template')
 

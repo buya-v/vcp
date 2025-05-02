@@ -150,9 +150,27 @@
             </t>
         </template>
 
-        <!-- Template for the Thank You Page (Unchanged) -->
+        <!-- Template for the Thank You Page -->
         <template id="membership_application_thankyou_template" name="Membership Application Submitted">
-            <!-- ... (content remains the same) ... -->
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="s_text_block pt48 pb48 text-center">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8 col-md-10">
+                                    <i class="fa fa-check-circle fa-5x text-success mb-4" aria-hidden="true"></i>
+                                    <h1 class="display-4">Thank You!</h1>
+                                    <p class="lead">Your membership application has been successfully submitted.</p>
+                                    <p>We have received your details and will review your application shortly. We will contact you via the email address provided if we need further information or once a decision has been made.</p>
+                                    <div class="mt-4">
+                                        <a href="/" class="btn btn-primary">Return to Homepage</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </t>
         </template>
 
     </data>

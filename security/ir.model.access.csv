@@ -6,3 +6,6 @@ access_membership_application_user,access.membership.application.user,model_vcp_
 access_membership_application_manager,access.membership.application.manager,model_vcp_membership_application,base.group_system,1,1,1,1
 access_cooperative_public,access.cooperative.public,model_vcp_cooperative,base.group_public,1,0,0,0
 access_cooperative_portal,access.cooperative.portal,model_vcp_cooperative,base.group_portal,1,0,0,0
+access_cooperative_application_user,access.cooperative.application.user,model_vcp_cooperative_application,base.group_user,1,0,1,0
+access_cooperative_application_manager,access.cooperative.application.manager,model_vcp_cooperative_application,base.group_system,1,1,1,1
+access_cooperative_type_public,access.cooperative.type.public,model_vcp_cooperative_type,base.group_public,1,0,0,0

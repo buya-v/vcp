@@ -5,9 +5,18 @@
         <record id="seq_membership_application" model="ir.sequence">
             <field name="name">Membership Application Sequence</field>
             <field name="code">vcp.membership.application</field>
-            <field name="prefix">APP/</field>
+            <field name="prefix">MAPP/</field>
             <field name="padding">5</field>
             <field name="company_id" eval="False"/> <!-- False for shared sequence -->
+        </record>
+
+        <!-- Sequence for vcp.cooperative.application -->
+        <record id="seq_cooperative_application" model="ir.sequence">
+            <field name="name">Cooperative Application Sequence</field>
+            <field name="code">vcp.cooperative.application</field>
+            <field name="prefix">CAPP/</field> <!-- Different prefix -->
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
         </record>
 
     </data>
