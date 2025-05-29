@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
@@ -25,3 +25,29 @@ class ResPartner(models.Model):
         string='Company Type',
         help="Specify the type of company. This is typically relevant when 'Is a Company' is checked."
     )
+
+    # New fields for individuals
+    surname = fields.Char(string="Surname")
+    firstname = fields.Char(string="First Name")
+    register = fields.Char(
+        string="Register",
+        help="Individual's registration number"
+    )
+    national_id = fields.Char(
+        string="National ID",
+        help="Individual's national ID number"
+    )
+
+    @api.onchange('firstname', 'surname')
+    def _onchange_individual_name(self):
+        """
+        When firstname or surname is changed for an individual,
+        update the main 'name' field.
+        """
+        if not self.is_company and (self.firstname or self.surname):
+            parts = []
+            if self.surname:
+                parts.append(self.surname.strip())
+            if self.firstname:
+                parts.append(self.firstname.strip())
+            self.name = " ".join(parts)
