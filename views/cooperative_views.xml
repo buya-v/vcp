@@ -51,9 +51,26 @@
                         </div>
                         <!-- Main Fields -->
                         <group>
-                            <field name="name"/>
-                            <field name="description"/>
-                            <field name="cooperative_type_id"/>
+                            <group string="General Information">
+                                <field name="name"/>
+                                <field name="partner_id"/>
+                                <field name="cooperative_type_id"/>
+                            </group>
+                            <group string="Company Address (from Partner)">
+                                <field name="partner_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                <label for="street" string="Address"/>
+                                <div class="o_address_format">
+                                    <field name="street" placeholder="Street..." class="o_address_street"/>
+                                    <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                    <field name="city" placeholder="City" class="o_address_city"/>
+                                    <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
+                                    <field name="zip_code" placeholder="ZIP" class="o_address_zip"/>
+                                    <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True}'/>
+                                </div>
+                            </group>
+                        </group>
+                        <group>
+                             <field name="description" nolabel="1" placeholder="Enter a description for the cooperative..."/>
                         </group>
                         <!-- Notebook for Related Info -->
                         <notebook>

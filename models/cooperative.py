@@ -16,6 +16,38 @@ class Cooperative(models.Model):
         help='The type of this cooperative.',
         ondelete='restrict'  # Added ondelete policy as suggested
     )
+    partner_id = fields.Many2one(
+        'res.partner', string='Associated Company', required=True,
+        domain="[('is_company', '=', True)]",
+        help="The company (partner) associated with this cooperative.",
+        ondelete='restrict'
+    )
+    # Related address fields from partner_id
+    street = fields.Char(related='partner_id.street', string="Street", readonly=True, store=True)
+    street2 = fields.Char(related='partner_id.street2', string="Street 2", readonly=True, store=True)
+    zip_code = fields.Char(related='partner_id.zip', string="Zip", readonly=True, store=True) # Renamed to zip_code to avoid potential keyword clash
+    city = fields.Char(related='partner_id.city', string="City", readonly=True, store=True)
+    state_id = fields.Many2one(
+        related='partner_id.state_id',
+        comodel_name='res.country.state',
+        string="State",
+        readonly=True,
+        store=True
+    )
+    country_id = fields.Many2one(
+        related='partner_id.country_id',
+        comodel_name='res.country',
+        string="Country",
+        readonly=True,
+        store=True
+    )
+    partner_tag_ids = fields.Many2many(
+        comodel_name='res.partner.category',
+        related='partner_id.category_id',
+        string="Company Tags",
+        readonly=True,
+        # store=True is not typically used for Many2many related fields unless specific search/grouping needs arise.
+    )
     member_ids = fields.One2many(
         'vcp.cooperative.member', 'cooperative_id', string='Members',
         help='The members of this cooperative.'
@@ -27,6 +59,15 @@ class Cooperative(models.Model):
         store=True,
         help='The number of members in this cooperative.'
     )
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        """
+        When the partner_id is changed, update the cooperative's name
+        to match the partner's name.
+        """
+        if self.partner_id:
+            self.name = self.partner_id.name
 
     @api.depends('member_ids')
     def _compute_member_count(self):
@@ -60,4 +101,3 @@ class Cooperative(models.Model):
              action['context'] = {'default_cooperative_id': self.id}
 
         return action
-
