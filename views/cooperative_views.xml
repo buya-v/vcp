@@ -6,12 +6,14 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="name" string="Cooperative"/>
-                    <field name="cooperative_type_id"/>
+                    <field name="company_type"/>
+                    <!-- <field name="cooperative_type_id"/> -->
                     <separator/>
                     <filter name="filter_active" string="Active" domain="[('active', '=', True)]"/>
                     <filter name="filter_inactive" string="Archived" domain="[('active', '=', False)]"/>
                     <group expand="1" string="Group By">
-                        <filter name="group_by_type" string="Type" context="{'group_by':'cooperative_type_id'}"/>
+                        <filter name="group_by_type" string="Type" context="{'group_by':'company_type'}"/>
+                        <!-- <filter name="group_by_type" string="Type" context="{'group_by':'cooperative_type_id'}"/> -->
                         <filter name="group_by_active" string="Status" context="{'group_by':'active'}"/>
                     </group>
                 </search>
@@ -25,8 +27,9 @@
             <field name="arch" type="xml">
                 <list>
                     <field name="name"/>
+                    <field name="company_type"/>
                     <field name="description" optional="hide"/> <!-- Hide description by default -->
-                    <field name="cooperative_type_id"/>
+                    <!-- <field name="cooperative_type_id"/> -->
                     <field name="member_count" sum="Total Members"/> <!-- Added member_count -->
                     <field name="active" optional="hide" widget="boolean_toggle"/> <!-- Added active field -->
                 </list>
@@ -54,7 +57,8 @@
                             <group string="General Information">
                                 <field name="name"/>
                                 <field name="partner_id"/>
-                                <field name="cooperative_type_id"/>
+                                <field name="company_type"/>
+                                <!-- <field name="cooperative_type_id"/> -->
                             </group>
                             <group string="Company Address (from Partner)">
                                 <field name="partner_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>

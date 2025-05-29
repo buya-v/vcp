@@ -48,6 +48,14 @@ class Cooperative(models.Model):
         readonly=True,
         # store=True is not typically used for Many2many related fields unless specific search/grouping needs arise.
     )
+    company_type = fields.Selection(
+        related='partner_id.company_type_selection',
+        string="Company Type",
+        readonly=True,
+        store=True
+    )
+
+
     member_ids = fields.One2many(
         'vcp.cooperative.member', 'cooperative_id', string='Members',
         help='The members of this cooperative.'
